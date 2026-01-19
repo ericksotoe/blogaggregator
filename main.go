@@ -10,7 +10,13 @@ func main() {
 	c, err := config.Read()
 	if err != nil {
 		fmt.Println(err)
-	} else {
-		fmt.Printf("%s is the url again\n", c.DbUrl)
 	}
+
+	err = c.SetUser("erick")
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	c, err = config.Read()
+	fmt.Printf("%s\n%s\n", c.DbUrl, c.Username)
 }
