@@ -3,6 +3,7 @@ package config
 import (
 	"encoding/json"
 	"os"
+	"strings"
 )
 
 const configFileName = "/.gatorconfig.json"
@@ -38,6 +39,7 @@ func write(cfg Config) error {
 	return nil
 }
 
+// converts the json found at filepath to the Config struct
 func Read() (Config, error) {
 	filePath, err := getConfigFilePath()
 	if err != nil {
@@ -53,6 +55,7 @@ func Read() (Config, error) {
 	return config, nil
 }
 
+// sets the user at in the Config struct
 func (c *Config) SetUser(name string) error {
 	c.Username = name
 	err := write(*c)
@@ -60,4 +63,11 @@ func (c *Config) SetUser(name string) error {
 		return err
 	}
 	return nil
+}
+
+// this function normalizes the text input and returns them
+func cleanInput(text string) []string {
+	text = strings.ToLower(text)
+	words := strings.Fields(text)
+	return words
 }
