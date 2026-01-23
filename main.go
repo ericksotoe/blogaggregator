@@ -36,6 +36,9 @@ func main() {
 	cmds := commands{registerredCommands: make(map[string]func(*state, command) error)}
 	cmds.register("login", handlerLogin)
 	cmds.register("register", handlerRegister)
+	cmds.register("reset", handlerReset)
+	cmds.register("users", handlerListUsers)
+
 	cmdArgs := os.Args
 	if len(cmdArgs) < 2 {
 		fmt.Printf("Please provide 2 arguments in the CLI")
