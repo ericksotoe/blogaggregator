@@ -14,7 +14,12 @@ FROM users
 WHERE $1 = name;
 
 -- name: Reset :exec
-TRUNCATE TABLE users;
+TRUNCATE users CASCADE;
 
 -- name: GetUsers :many
 SELECT name FROM users;
+
+-- name: GetUserFromID :one
+SELECT name 
+FROM users
+WHERE $1 = id;
