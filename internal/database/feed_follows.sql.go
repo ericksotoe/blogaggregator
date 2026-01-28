@@ -88,6 +88,30 @@ func (q *Queries) CreateFeedFollow(ctx context.Context, arg CreateFeedFollowPara
 	return items, nil
 }
 
+const deleteUsingBothIDS = `-- name: DeleteUsingBothIDS :one
+DELETE FROM feed_follows
+WHERE $1 = feed_id AND $2 = user_id
+RETURNING id, created_at, updated_at, user_id, feed_id
+`
+
+type DeleteUsingBothIDSParams struct {
+	FeedID uuid.UUID
+	UserID uuid.UUID
+}
+
+func (q *Queries) DeleteUsingBothIDS(ctx context.Context, arg DeleteUsingBothIDSParams) (FeedFollow, error) {
+	row := q.db.QueryRowContext(ctx, deleteUsingBothIDS, arg.FeedID, arg.UserID)
+	var i FeedFollow
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.UserID,
+		&i.FeedID,
+	)
+	return i, err
+}
+
 const getFeedFollowsForUser = `-- name: GetFeedFollowsForUser :many
 SELECT 
     feed_follows.id, feed_follows.created_at, feed_follows.updated_at, feed_follows.user_id, feed_follows.feed_id, 

@@ -10,16 +10,12 @@ import (
 	"github.com/google/uuid"
 )
 
-func handlerAddFeed(s *state, cmd command) error {
+func handlerAddFeed(s *state, cmd command, user database.User) error {
 	if len(cmd.args) != 2 {
 		return fmt.Errorf("the addfeed handler expects two arguments, the name and url.\n")
 	}
 	feedName := cmd.args[0]
 	feedURL := cmd.args[1]
-	user, err := s.db.GetUser(context.Background(), s.cfg.Username)
-	if err != nil {
-		fmt.Printf("user exists, body of error %s\n", err)
-	}
 	feedToAdd := database.CreateFeedParams{
 		ID:        uuid.New(),
 		CreatedAt: time.Now(),
