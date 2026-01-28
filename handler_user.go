@@ -42,7 +42,7 @@ func handlerRegister(s *state, cmd command) error {
 
 func handlerLogin(s *state, cmd command) error {
 	if len(cmd.args) != 1 {
-		return fmt.Errorf("the login handler expects a single argument, the username.\n")
+		return fmt.Errorf("the login command expects a single argument, the username.\n")
 	}
 	name := cmd.args[0]
 	_, err := s.db.GetUser(context.Background(), name)

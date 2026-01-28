@@ -1,0 +1,65 @@
+package main
+
+import (
+	"context"
+	"fmt"
+	"time"
+
+	"github.com/ericksotoe/blogaggregator/internal/database"
+	"github.com/google/uuid"
+)
+
+func handlerFeedFollow(s *state, cmd command) error {
+	if len(cmd.args) != 1 {
+		return fmt.Errorf("the follow command expects a single argument, the url.\n")
+	}
+
+	currentUser := s.cfg.Username
+	user, err := s.db.GetUser(context.Background(), currentUser)
+	if err != nil {
+		return fmt.Errorf("Error getting the user from the user db using name.")
+	}
+
+	feedURL := cmd.args[0]
+	feed, err := s.db.GetFeedByURL(context.Background(), feedURL)
+	if err != nil {
+		return fmt.Errorf("Error getting the feed from the given url.")
+	}
+
+	feedFollowToCreate := database.CreateFeedFollowParams{
+		ID:        uuid.New(),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		UserID:    user.ID,
+		FeedID:    feed.ID,
+	}
+
+	feedFollow, err := s.db.CreateFeedFollow(context.Background(), feedFollowToCreate)
+	if err != nil {
+		return fmt.Errorf("Error adding to the feed_follows table")
+	}
+	for _, feed := range feedFollow {
+		fmt.Printf("feed name: %s\ncurrent user: %s", feed.FeedName, feed.UserName)
+	}
+
+	return nil
+}
+
+func handlerFeedFollowsForUser(s *state, cmd command) error {
+	currentUser := s.cfg.Username
+	user, err := s.db.GetUser(context.Background(), currentUser)
+	if err != nil {
+		return fmt.Errorf("Error getting the user from the db using the username")
+	}
+
+	feedsFollows, err := s.db.GetFeedFollowsForUser(context.Background(), user.ID)
+	if err != nil {
+		return fmt.Errorf("Error getting the feed following using the user ID")
+	}
+
+	for _, feed := range feedsFollows {
+		fmt.Printf("User: %s is following %s\n", feed.UserName, feed.FeedName)
+	}
+
+	return nil
+}

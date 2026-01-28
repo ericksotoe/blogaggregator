@@ -29,10 +29,23 @@ func handlerAddFeed(s *state, cmd command) error {
 		UserID:    user.ID,
 	}
 
-	_, err = s.db.CreateFeed(context.Background(), feedToAdd)
+	feed, err := s.db.CreateFeed(context.Background(), feedToAdd)
 	if err != nil {
 		fmt.Printf("error creating the feed with following passed in params\nName: %s\nURL: %s\nError body: %s", feedName, feedURL, err)
 		os.Exit(1)
+	}
+
+	feedFollowToCreate := database.CreateFeedFollowParams{
+		ID:        uuid.New(),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		UserID:    user.ID,
+		FeedID:    feed.ID,
+	}
+
+	_, err = s.db.CreateFeedFollow(context.Background(), feedFollowToCreate)
+	if err != nil {
+		return fmt.Errorf("Error adding to the feed_follows table")
 	}
 
 	// add a printing helper for the different structs and print out this struct
