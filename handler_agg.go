@@ -1,20 +1,22 @@
 package main
 
 import (
-	"context"
 	"fmt"
+	"time"
 )
 
 func handlerAgg(s *state, cmd command) error {
-	url := "https://www.wagslane.dev/index.xml"
-	feed, err := fetchFeed(context.Background(), url)
+	if len(cmd.args) != 1 {
+		return fmt.Errorf("Invalid arguments provided to the agg command, please add a time ex: 1s, 1m, 1h")
+	}
+	timeBetweenRequests, err := time.ParseDuration(cmd.args[0])
 	if err != nil {
-		return err
+		return fmt.Errorf("Something went wrong when changing the string time into ticker time")
 	}
 
-	fmt.Printf("Title: %s\nLink: %s\nDescription: %s\n", feed.Channel.Title, feed.Channel.Link, feed.Channel.Description)
-	for _, item := range feed.Channel.Item {
-		fmt.Printf("Title: %s\nLink: %s\nDescription: %s\n", item.Title, item.Link, item.Description)
+	fmt.Printf("Collecting feeds every %v\n", timeBetweenRequests)
+	ticker := time.NewTicker(timeBetweenRequests)
+	for ; ; <-ticker.C {
+		scrapeFeeds(s)
 	}
-	return nil
 }
