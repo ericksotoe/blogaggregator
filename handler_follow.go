@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/ericksotoe/blogaggregator/internal/database"
@@ -30,7 +31,12 @@ func handlerFeedFollow(s *state, cmd command, user database.User) error {
 
 	feedFollow, err := s.db.CreateFeedFollow(context.Background(), feedFollowToCreate)
 	if err != nil {
-		return fmt.Errorf("Error adding to the feed_follows table")
+		// check for "duplicate key" and ignore / log nicely
+		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
+			fmt.Println("You are already following this feed.")
+			return nil
+		}
+		return fmt.Errorf("error adding to feed_follows (user %s, feed %s): %w", user.ID, feed.ID, err)
 	}
 	for _, feed := range feedFollow {
 		fmt.Printf("feed name: %s\ncurrent user: %s", feed.FeedName, feed.UserName)

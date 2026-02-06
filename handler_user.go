@@ -63,12 +63,18 @@ func handlerLogin(s *state, cmd command) error {
 func handlerListUsers(s *state, cmd command) error {
 	users, err := s.db.GetUsers(context.Background())
 	if err != nil {
-		return err
+		return fmt.Errorf("No users found in the db: %w\n", err)
+	}
+
+	if len(users) == 0 {
+		fmt.Println("No users found in the database. Try creating one with 'register <name>'")
+		return nil
 	}
 
 	currentlyLoggedUser := s.cfg.Username
+
 	for _, user := range users {
-		if user == currentlyLoggedUser {
+		if user == currentlyLoggedUser && currentlyLoggedUser != "" {
 			fmt.Printf("* %s (current)\n", user)
 		} else {
 			fmt.Printf("* %s\n", user)

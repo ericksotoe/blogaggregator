@@ -43,9 +43,6 @@ func handlerAddFeed(s *state, cmd command, user database.User) error {
 	if err != nil {
 		return fmt.Errorf("Error adding to the feed_follows table")
 	}
-
-	// add a printing helper for the different structs and print out this struct
-
 	return nil
 }
 
@@ -53,6 +50,11 @@ func handlerGetFeed(s *state, cmd command) error {
 	feeds, err := s.db.GetFeeds(context.Background())
 	if err != nil {
 		return fmt.Errorf("Ran into an error when getting the feed from the feeds db/ body:%s", err)
+	}
+
+	if len(feeds) == 0 {
+		fmt.Println("The database doesn't have any feeds")
+		return nil
 	}
 
 	for _, feed := range feeds {
