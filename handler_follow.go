@@ -31,7 +31,7 @@ func handlerFeedFollow(s *state, cmd command, user database.User) error {
 
 	feedFollow, err := s.db.CreateFeedFollow(context.Background(), feedFollowToCreate)
 	if err != nil {
-		// check for "duplicate key" and ignore / log nicely
+		// check for "duplicate key"
 		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
 			fmt.Println("You are already following this feed.")
 			return nil
